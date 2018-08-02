@@ -1,58 +1,43 @@
 const setup = function () {
-    const canvas = $("#main-canvas");
+    const canvas = $("#maincanvas");
     const context = canvas.get(0).getContext("2d");
     canvas.get(0).width = $(window).width();
     canvas.get(0).height = $(window).height();
 
     let points = [];
 
-    canvas.bind("touchstart", function () {
-        const x = event.pageX;
-        const y = event.pageY;
-        points = [{point: {x: x, y: y, z: 0.0, r: 0.0}, param: Date.now() * 10e-4}];
-        $("#svg-area").empty();
+    canvas.bind("touchstart", function (event) {
+        points = [new InputPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY)];
+        $("#svgarea").empty();
     });
 
     canvas.bind("touchmove", function (event) {
         event.preventDefault();
-        const x = event.changedTouches[0].pageX;
-        const y = event.changedTouches[0].pageY;
         if (0 < points.length) {
             const from = points[points.length - 1];
-            context.beginPath();
-            context.moveTo(from.point.x, from.point.y);
-            context.lineTo(x, y);
-            context.closePath();
-            context.stroke();
-            points.push({point: {x: x, y: y, z: 0.0, r: 0.0}, param: Date.now() * 10e-4});
+            const to = new InputPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
+            drawInput(context, from, to);
+            points.push(to);
         }
     });
 
     canvas.bind("touchend", function () {
-        console.log("end");
         const json = `{"canvas":{"x":${$(window).width()},"y":${$(window).height()}},"points":${JSON.stringify(points)}}`;
         send(json);
         points = [];
     });
 
     canvas.mousedown(function (event) {
-        const x = event.pageX;
-        const y = event.pageY;
-        points = [{point: {x: x, y: y, z: 0.0, r: 0.0}, param: Date.now() * 10e-4}];
-        $("#svg-area").empty();
+        points = [new InputPoint(event.pageX, event.pageY)];
+        $("#svgarea").empty();
     });
 
     canvas.mousemove(function (event) {
-        const x = event.pageX;
-        const y = event.pageY;
         if (0 < points.length) {
             const from = points[points.length - 1];
-            context.beginPath();
-            context.moveTo(from.point.x, from.point.y);
-            context.lineTo(x, y);
-            context.closePath();
-            context.stroke();
-            points.push({point: {x: x, y: y, z: 0.0, r: 0.0}, param: Date.now() * 10e-4})
+            const to = new InputPoint(event.pageX, event.pageY);
+            drawInput(context, from, to);
+            points.push(to);
         }
     });
 
@@ -64,13 +49,33 @@ const setup = function () {
 };
 
 const send = function (json) {
+    console.log(json);
     $.post("/fsci", json)
         .done(function (data) {
-            const canvas = $("#main-canvas");
+            const canvas = $("#maincanvas");
             const context = canvas.get(0).getContext("2d");
             const parser = new DOMParser();
             const dom = parser.parseFromString(data, "text/xml");
-            $("#svg-area").append(dom.documentElement);
+            $("#svgarea").append(dom.documentElement);
             context.clearRect(0, 0, canvas.get(0).width, canvas.get(0).height);
         })
 };
+
+const drawInput = function(context, from, to) {
+    context.beginPath();
+    context.moveTo(from.x, from.y);
+    context.lineTo(to.x, to.y);
+    context.closePath();
+    context.stroke();
+};
+
+class InputPoint {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.param = Date.now() * 10e-4;
+    }
+    toJSON() {
+        return {point: {x: this.x, y: this.y, z: 0.0, r: 0.0}, param: this.param};
+    }
+}

@@ -2,13 +2,13 @@
     position: relative;
 }
 
-#main-canvas {
+#maincanvas {
     position: absolute;
     top: 0;
     z-index: 2;
 }
 
-#svg-area {
+#svgarea {
     position: absolute;
     top: 0;
     z-index: 1;

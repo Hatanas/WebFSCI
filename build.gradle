@@ -1,6 +1,9 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.2.51'
+    id 'application'
 }
+
+mainClassName = 'net.hatanas.webfsci.WebFSCIKt'
 
 group 'net.hatanas'
 version '0.0.1'
@@ -14,7 +17,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "com.sparkjava:spark-core:2.7.2"
     compile "org.slf4j:slf4j-simple:1.7.21"
-
 
     compile group: 'com.github.salomonbrys.kotson', name: 'kotson', version: '2.5.0'
     compile group: 'io.vavr', name: 'vavr', version: '0.9.1'
