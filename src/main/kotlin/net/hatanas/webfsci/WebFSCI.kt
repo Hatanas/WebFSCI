@@ -13,7 +13,6 @@ import jumpaku.core.util.component1
 import jumpaku.core.util.component2
 import jumpaku.fsc.generate.FscGenerator
 import jumpaku.fsc.identify.Primitive7Identifier
-import jumpaku.fsc.identify.reference.reparametrize
 import jumpaku.fsc.identify.reparametrize
 import org.jfree.graphics2d.svg.SVGGraphics2D
 import spark.Spark.post
@@ -32,7 +31,6 @@ fun main(vararg args: String) {
         val points = Array.ofAll(json["points"].array.flatMap { ParamPoint.fromJson(it) })
         val fsc = reparametrize(FscGenerator().generate(points))
         val result = Primitive7Identifier().identify(fsc)
-        println(result.grades)
         SVGGraphics2D(width, height)
                 .drawFuzzyCurve(fsc, BasicStroke(1.0f), Color.CYAN)
                 .drawPolyline(fsc, BasicStroke(2.0f), Color.CYAN)
