@@ -49,7 +49,6 @@ const setup = function () {
 };
 
 const send = function (json) {
-    console.log(json);
     $.post("/fsci", json)
         .done(function (data) {
             const canvas = $("#maincanvas");
